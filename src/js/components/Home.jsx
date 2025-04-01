@@ -12,14 +12,14 @@ const Home = () => {
     const addToList = async (e) => {
         e.preventDefault();
         let ToDo = {label: inputValue, is_done: false}
-        let response = await fetch('https://playground.4geeks.com/todo/users/KevinC-Hub', {
+        let response = await fetch('https://playground.4geeks.com/todo/todos/KevinC-Hub', {
             method: "POST",
             headers: { "Content-type": "application/json" },
             body: JSON.stringify(ToDo)
         })
         let data = await response.json()
         getUser()
-        inputValue("")
+        setInputValue("")
     };
     const removeToDo = async (id) =>{
         let deleteResponse = await fetch(`https://playground.4geeks.com/todo/todos/${id}`, {
@@ -57,17 +57,16 @@ const Home = () => {
 						value={inputValue}
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
-								setTodos(todos.concat(inputValue));
-								setInputValue("");
+								addToList(e)
 							}
 						}}
 						placeholder="What do you need to do?"></input>
 				</li>
 				{todos.map((item, index) => (
 					<li key = {item.id}>
-						{item}{""} 
+						{item.label}{""} 
 						<i 
-							class="fa-regular fa-x"
+							className="fa-regular fa-x"
 							onClick={()=> 
 							{removeToDo(item.id)}
 							}></i>
