@@ -1,11 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-//create your first component
 
 const Home = () => {
 	const [ inputValue, setInputValue ] = useState("")
 	const [ todos, setTodos ] = useState([])
 
+	useEffect(()=> {
+        getUser()
+    },[])
+    
+    const addToList = async (e) => {
+        e.preventDefault();
+        let ToDo = {label: inputValue, is_done: false}
+        let response = await fetch('https://playground.4geeks.com/todo/users/KevinC-Hub', {
+            method: "POST",
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify(ToDo)
+        })
+        let data = await response.json()
+        getUser()
+        inputValue("")
+    };
+    const removeToDo = async (id) =>{
+        let deleteResponse = await fetch(`https://playground.4geeks.com/todo/todos/${id}`, {
+            method: "DELETE",
+            headers: { "Content-type": "application/json" },
+        })
+		getUser()
+    };
+    const getUser = async() => {
+        let response = await fetch('https://playground.4geeks.com/todo/users/KevinC-Hub')
+        let data = await response.json()
+        console.log(data)
+        if(typeof data.name !='undefined') {
+            setTodos(data.todos)
+            console.log(data.name)
+        }
+        else {
+            let response = await fetch('https://playground.4geeks.com/todo/users/KevinC-Hub',{
+                method: "POST",
+                headers: { "Content-type": "application/json" },
+            })
+            let data = await response.json()
+			setTodos(data.todos)
+        }
+    };
 
 	return (
 		<div className="container">
@@ -25,17 +64,12 @@ const Home = () => {
 						placeholder="What do you need to do?"></input>
 				</li>
 				{todos.map((item, index) => (
-					<li>
+					<li key = {item.id}>
 						{item}{""} 
 						<i 
 							class="fa-regular fa-x"
 							onClick={()=> 
-								setTodos(
-									todos.filter(
-										(t, currentIndex) => 
-											index != currentIndex 
-									)
-								)
+							{removeToDo(item.id)}
 							}></i>
 					</li>
 				))}
